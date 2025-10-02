@@ -2,6 +2,8 @@
 import { ref, onMounted } from "vue"
 import { db } from "../firebase"
 import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore"
+import { messaging } from "../firebase"
+import { getToken, onMessage } from "firebase/messaging"
 
 const members = ref([])
 const showForm = ref(false)
@@ -76,9 +78,33 @@ async function checkBirthdays() {
   }
 }
 
+// FCM Token et permission
+async function requestPermission() {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      const token = await getToken(messaging, { vapidKey: "TA_VAPID_KEY" });
+      console.log("Token FCM:", token);
+      // Enregistrer ce token dans Firestore sous le user connecté pour envoyer les notifications
+    } else {
+      console.log("Permission refusée pour les notifications");
+    }
+  } catch (err) {
+    console.error("Erreur permission notifications:", err);
+  }
+}
+
+
 onMounted(() => {
   loadMembers()
   checkBirthdays()
+   requestPermission();
+
+  // Notifications reçues en temps réel (app ouverte)
+  onMessage(messaging, (payload) => {
+    console.log("Notification reçue:", payload);
+    alert(payload.notification.title + "\n" + payload.notification.body);
+  });
 })
 </script>
 
@@ -97,7 +123,7 @@ onMounted(() => {
       <input v-model="form.service" placeholder="Service" class="border p-1 m-1"/>
       <input v-model="form.prayerRequest" placeholder="Requête de prière" class="border p-1 m-1"/>
       <input v-model="form.comment" placeholder="Commentaire" class="border p-1 m-1"/>
-      
+
       
       <button @click="saveMember" class="bg-blue-600 text-white p-1 m-1 rounded">Enregistrer</button>
       <button @click="cancelForm" class="bg-gray-400 text-white p-1 m-1 rounded">Annuler</button>
