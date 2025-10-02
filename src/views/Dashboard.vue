@@ -94,6 +94,44 @@ async function requestPermission() {
   }
 }
 
+// Exemple de Cloud Function pour envoyer les notifications d'anniversaire
+// (à déployer dans Firebase Functions, pas ici dans le front)
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+admin.initializeApp();
+
+exports.sendBirthdayPush = functions.pubsub.schedule('every day 08:00').timeZone('Europe/Paris').onRun(async () => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const mmdd = ("0"+(tomorrow.getMonth()+1)).slice(-2) + "-" + ("0"+tomorrow.getDate()).slice(-2);
+
+  // Récupérer tous les membres ayant anniversaire demain
+  const snap = await admin.firestore().collection('membres').where('birthMd', '==', mmdd).get();
+  if (snap.empty) return null;
+
+  const messages = [];
+  snap.forEach(doc => {
+    const member = doc.data();
+    // Ici, récupérer tous les tokens des admins
+    // Exemple : collection('users').where('role', 'in', ['Admin','SuperAdmin'])
+    // et push { token: ..., notification: {title, body} }
+    messages.push({
+      notification: {
+        title: "Anniversaire demain 🎉",
+        body: `${member.firstName} ${member.lastName} a son anniversaire demain`
+      },
+      topic: "admins" // ou token individuel
+    });
+  });
+
+  if (messages.length) {
+    // envoyer en batch
+    await admin.messaging().sendAll(messages);
+  }
+  return null;
+});
+
+
 
 onMounted(() => {
   loadMembers()
