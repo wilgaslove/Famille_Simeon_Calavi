@@ -98,6 +98,7 @@ onMounted(() => {
       <input v-model="form.prayerRequest" placeholder="Requête de prière" class="border p-1 m-1"/>
       <input v-model="form.comment" placeholder="Commentaire" class="border p-1 m-1"/>
       
+      
       <button @click="saveMember" class="bg-blue-600 text-white p-1 m-1 rounded">Enregistrer</button>
       <button @click="cancelForm" class="bg-gray-400 text-white p-1 m-1 rounded">Annuler</button>
     </div>
