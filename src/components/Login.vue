@@ -1,22 +1,3 @@
-<template>
-  <div class="h-screen flex items-center justify-center bg-gray-100">
-    <div class="bg-white shadow-lg p-6 rounded-xl w-96">
-      <h2 class="text-2xl font-bold mb-4 text-center">Connexion Admin</h2>
-
-      <form @submit.prevent="login" class="space-y-3">
-        <input v-model="email" type="email" placeholder="Email" class="w-full p-2 border rounded" required />
-        <input v-model="password" type="password" placeholder="Mot de passe" class="w-full p-2 border rounded" required />
-
-        <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">
-          Se connecter
-        </button>
-      </form>
-
-      <p v-if="error" class="text-red-500 mt-3">{{ error }}</p>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref } from "vue";
 import { signInWithEmailAndPassword, signOut, getIdTokenResult } from "firebase/auth";
@@ -68,3 +49,24 @@ async function login() {
   }
 }
 </script>
+
+
+<template>
+  <div class="h-screen flex items-center justify-center bg-gray-100">
+    <div class="bg-white shadow-lg p-6 rounded-xl w-96">
+      <h2 class="text-2xl font-bold mb-4 text-center">Connexion Admin</h2>
+
+      <form @submit.prevent="login" class="space-y-3">
+        <input v-model="email" type="email" placeholder="Email" class="w-full p-2 border rounded" required />
+        <input v-model="password" type="password" placeholder="Mot de passe" class="w-full p-2 border rounded" required />
+
+        <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">
+          Se connecter
+        </button>
+      </form>
+
+      <p v-if="error" class="text-red-500 mt-3">{{ error }}</p>
+    </div>
+  </div>
+</template>
+
