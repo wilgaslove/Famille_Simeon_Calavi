@@ -58,7 +58,28 @@ function viewMember(member) {
   modalMember.value = member
 }
 
-onMounted(loadMembers)
+// Notification anniversaire
+const birthdayAlert = ref([])
+
+async function checkBirthdays() {
+  const today = new Date()
+  today.setDate(today.getDate() + 1) // demain
+  const mmdd = ("0"+(today.getMonth()+1)).slice(-2) + "-" + ("0"+today.getDate()).slice(-2)
+
+  const snap = await getDocs(collection(db, "membres"))
+  birthdayAlert.value = snap.docs
+    .map(d => ({ id:d.id, ...d.data() }))
+    .filter(m => m.birthMd === mmdd)
+
+  if (birthdayAlert.value.length) {
+    alert("🎉 Demain, anniversaire de: " + birthdayAlert.value.map(m => m.firstName + " " + m.lastName).join(", "))
+  }
+}
+
+onMounted(() => {
+  loadMembers()
+  checkBirthdays()
+})
 </script>
 
 
