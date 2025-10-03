@@ -1,9 +1,10 @@
-// Import des fonctions nécessaires depuis Firebase
+// src/firebase.js
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getFunctions } from "firebase/functions";
+import  { getMessaging, getToken, onMessage } from "firebase/messaging";
 
-// Configuration de ton projet Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyD0ubmpA7J5RA_BG0krb0dez57RUUajKCc",
   authDomain: "famille-simeon-calavi.firebaseapp.com",
@@ -12,10 +13,9 @@ const firebaseConfig = {
   messagingSenderId: "910547713559",
   appId: "1:910547713559:web:b6b712159fafcbb43aa652"
 };
-
-// Initialisation de Firebase
 const app = initializeApp(firebaseConfig);
 
-// Export des modules Auth et Firestore
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const functions = getFunctions(app);
+export const messaging = getMessaging(app);
