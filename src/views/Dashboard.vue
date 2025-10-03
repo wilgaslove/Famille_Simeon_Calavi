@@ -133,6 +133,7 @@ exports.sendBirthdayPush = functions.pubsub.schedule('every day 08:00').timeZone
 
 
 
+
 onMounted(() => {
   loadMembers()
   checkBirthdays()
