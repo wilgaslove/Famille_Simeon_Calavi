@@ -1,208 +1,134 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import { db } from "../firebase"
-import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore"
-import { messaging } from "../firebase"
-import { getToken, onMessage } from "firebase/messaging"
+import {
+  collection,
+  addDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  doc
+} from "firebase/firestore"
 
-const members = ref([])
-const showForm = ref(false)
-const modalMember = ref(null)
+// Références
+const membres = ref([])
+const newMembre = ref({ firstName: "", lastName: "", birthday: "", service: "", request: "", comment: "" })
+const selectedMembre = ref(null) // pour le modal
+const showModal = ref(false)
 
-const form = ref({
-  firstName: "",
-  lastName: "",
-  birthday: "",
-  service: "",
-  prayerRequest: "",
-  comment: ""
-})
-
-async function loadMembers() {
+// Charger les membres
+async function fetchMembres() {
+  membres.value = []
   const snap = await getDocs(collection(db, "membres"))
-  members.value = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+  snap.forEach((d) => {
+    membres.value.push({ id: d.id, ...d.data() })
+  })
 }
 
-async function saveMember() {
-  // Ajouter birthMd pour notification
-  const birthMd = form.value.birthday ? form.value.birthday.substring(5) : ""
-  if (form.value.id) {
-    // update
-    await updateDoc(doc(db, "membres", form.value.id), { ...form.value, birthMd })
-  } else {
-    // create
-    await addDoc(collection(db, "membres"), { ...form.value, birthMd })
-  }
-  form.value = { firstName:"", lastName:"", birthday:"", service:"", prayerRequest:"", comment:"" }
-  showForm.value = false
-  loadMembers()
+// Ajouter un membre
+async function addMembre() {
+  if (!newMembre.value.firstName || !newMembre.value.lastName) return
+  await addDoc(collection(db, "membres"), newMembre.value)
+  newMembre.value = { firstName: "", lastName: "", birthday: "", service: "", request: "", comment: "" }
+  fetchMembres()
 }
 
-function editMember(member) {
-  form.value = { ...member }
-  form.value.id = member.id
-  showForm.value = true
+// Modifier un membre
+async function updateMembre(m) {
+  const docRef = doc(db, "membres", m.id)
+  await updateDoc(docRef, {
+    firstName: m.firstName,
+    lastName: m.lastName,
+    birthday: m.birthday,
+    service: m.service,
+    request: m.request,
+    comment: m.comment
+  })
+  fetchMembres()
 }
 
-async function deleteMember(id) {
-  if (confirm("Voulez-vous supprimer ce membre ?")) {
-    await deleteDoc(doc(db, "membres", id))
-    loadMembers()
-  }
+// Supprimer un membre
+async function deleteMembre(id) {
+  await deleteDoc(doc(db, "membres", id))
+  fetchMembres()
 }
 
-function cancelForm() {
-  form.value = { firstName:"", lastName:"", birthday:"", service:"", prayerRequest:"", comment:"" }
-  showForm.value = false
+// Ouvrir modal
+function openModal(membre) {
+  selectedMembre.value = { ...membre }
+  showModal.value = true
 }
 
-function viewMember(member) {
-  modalMember.value = member
+// Fermer modal
+function closeModal() {
+  showModal.value = false
+  selectedMembre.value = null
 }
-
-// Notification anniversaire
-const birthdayAlert = ref([])
-
-async function checkBirthdays() {
-  const today = new Date()
-  today.setDate(today.getDate() + 1) // demain
-  const mmdd = ("0"+(today.getMonth()+1)).slice(-2) + "-" + ("0"+today.getDate()).slice(-2)
-
-  const snap = await getDocs(collection(db, "membres"))
-  birthdayAlert.value = snap.docs
-    .map(d => ({ id:d.id, ...d.data() }))
-    .filter(m => m.birthMd === mmdd)
-
-  if (birthdayAlert.value.length) {
-    alert("🎉 Demain, anniversaire de: " + birthdayAlert.value.map(m => m.firstName + " " + m.lastName).join(", "))
-  }
-}
-
-// FCM Token et permission
-async function requestPermission() {
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission === "granted") {
-      const token = await getToken(messaging, { vapidKey: "TA_VAPID_KEY" });
-      console.log("Token FCM:", token);
-      // Enregistrer ce token dans Firestore sous le user connecté pour envoyer les notifications
-    } else {
-      console.log("Permission refusée pour les notifications");
-    }
-  } catch (err) {
-    console.error("Erreur permission notifications:", err);
-  }
-}
-
-// Exemple de Cloud Function pour envoyer les notifications d'anniversaire
-// (à déployer dans Firebase Functions, pas ici dans le front)
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-admin.initializeApp();
-
-exports.sendBirthdayPush = functions.pubsub.schedule('every day 08:00').timeZone('Europe/Paris').onRun(async () => {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const mmdd = ("0"+(tomorrow.getMonth()+1)).slice(-2) + "-" + ("0"+tomorrow.getDate()).slice(-2);
-
-  // Récupérer tous les membres ayant anniversaire demain
-  const snap = await admin.firestore().collection('membres').where('birthMd', '==', mmdd).get();
-  if (snap.empty) return null;
-
-  const messages = [];
-  snap.forEach(doc => {
-    const member = doc.data();
-    // Ici, récupérer tous les tokens des admins
-    // Exemple : collection('users').where('role', 'in', ['Admin','SuperAdmin'])
-    // et push { token: ..., notification: {title, body} }
-    messages.push({
-      notification: {
-        title: "Anniversaire demain 🎉",
-        body: `${member.firstName} ${member.lastName} a son anniversaire demain`
-      },
-      topic: "admins" // ou token individuel
-    });
-  });
-
-  if (messages.length) {
-    // envoyer en batch
-    await admin.messaging().sendAll(messages);
-  }
-  return null;
-});
-
-
-
 
 onMounted(() => {
-  loadMembers()
-  checkBirthdays()
-   requestPermission();
-
-  // Notifications reçues en temps réel (app ouverte)
-  onMessage(messaging, (payload) => {
-    console.log("Notification reçue:", payload);
-    alert(payload.notification.title + "\n" + payload.notification.body);
-  });
+  fetchMembres()
 })
 </script>
 
-
 <template>
-  <div class="p-6">
-    <h2 class="text-2xl font-bold mb-4">Gestion des Membres</h2>
+  <div class="p-6 max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">Gestion des Membres</h1>
 
-    <button @click="showForm = true" class="mb-4 bg-green-600 text-white p-2 rounded">Ajouter un membre</button>
-
-    <!-- Formulaire d'ajout / édition -->
-    <div v-if="showForm" class="mb-4 p-4 border rounded bg-gray-50">
-      <input v-model="form.firstName" placeholder="Prénom" class="border p-1 m-1"/>
-      <input v-model="form.lastName" placeholder="Nom" class="border p-1 m-1"/>
-      <input v-model="form.birthday" type="date" class="border p-1 m-1"/>
-      <input v-model="form.service" placeholder="Service" class="border p-1 m-1"/>
-      <input v-model="form.prayerRequest" placeholder="Requête de prière" class="border p-1 m-1"/>
-      <input v-model="form.comment" placeholder="Commentaire" class="border p-1 m-1"/>
-
-      
-      <button @click="saveMember" class="bg-blue-600 text-white p-1 m-1 rounded">Enregistrer</button>
-      <button @click="cancelForm" class="bg-gray-400 text-white p-1 m-1 rounded">Annuler</button>
+    <!-- Formulaire ajout -->
+    <div class="mb-6 p-4 border rounded-lg shadow bg-white">
+      <h2 class="text-lg font-semibold mb-2">Ajouter un membre</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <input v-model="newMembre.firstName" placeholder="Prénom" class="p-2 border rounded" />
+        <input v-model="newMembre.lastName" placeholder="Nom" class="p-2 border rounded" />
+        <input v-model="newMembre.birthday" type="date" placeholder="Anniversaire" class="p-2 border rounded" />
+        <input v-model="newMembre.service" placeholder="Pôle de service" class="p-2 border rounded" />
+        <input v-model="newMembre.request" placeholder="Requête de prière" class="p-2 border rounded col-span-2" />
+        <textarea v-model="newMembre.comment" placeholder="Commentaire" class="p-2 border rounded col-span-2"></textarea>
+      </div>
+      <button @click="addMembre" class="mt-3 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+        ➕ Ajouter
+      </button>
     </div>
 
     <!-- Liste des membres -->
-    <table class="w-full border">
+    <h2 class="text-lg font-semibold mb-3">Liste des membres</h2>
+    <table class="w-full border-collapse">
       <thead>
         <tr class="bg-gray-200">
-          <th class="border p-2">Nom</th>
-          <th class="border p-2">Prénom</th>
-          <th class="border p-2">Service</th>
-          <th class="border p-2">Actions</th>
+          <th class="p-2 border">Nom</th>
+          <th class="p-2 border">Anniversaire</th>
+          <th class="p-2 border">Service</th>
+          <th class="p-2 border">Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="member in members" :key="member.id" class="border-b">
-          <td class="p-2">{{ member.lastName }}</td>
-          <td class="p-2">{{ member.firstName }}</td>
-          <td class="p-2">{{ member.service }}</td>
-          <td class="p-2 space-x-1">
-            <button @click="editMember(member)" class="bg-yellow-500 text-white p-1 rounded">Modifier</button>
-            <button @click="deleteMember(member.id)" class="bg-red-600 text-white p-1 rounded">Supprimer</button>
-            <button @click="viewMember(member)" class="bg-blue-400 text-white p-1 rounded">Voir</button>
+        <tr v-for="m in membres" :key="m.id" class="hover:bg-gray-50">
+          <td class="p-2 border">{{ m.firstName }} {{ m.lastName }}</td>
+          <td class="p-2 border">{{ m.birthday }}</td>
+          <td class="p-2 border">{{ m.service }}</td>
+          <td class="p-2 border flex gap-2">
+            <button @click="openModal(m)" class="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">👀 Voir</button>
+            <button @click="updateMembre(m)" class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">✏️ Modifier</button>
+            <button @click="deleteMembre(m.id)" class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700">🗑️ Supprimer</button>
           </td>
         </tr>
       </tbody>
     </table>
 
     <!-- Modal -->
-    <div v-if="modalMember" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div class="bg-white p-6 rounded w-96">
-        <h3 class="font-bold text-xl mb-2">{{ modalMember.firstName }} {{ modalMember.lastName }}</h3>
-        <p>Service: {{ modalMember.service }}</p>
-        <p>Anniversaire: {{ modalMember.birthday }}</p>
-        <p>Requête: {{ modalMember.prayerRequest }}</p>
-        <p>Commentaire: {{ modalMember.comment }}</p>
-        <button @click="modalMember=null" class="mt-3 bg-gray-400 text-white p-2 rounded">Fermer</button>
+    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+        <h2 class="text-xl font-bold mb-3">Détails du membre</h2>
+        <p><strong>Nom :</strong> {{ selectedMembre.firstName }} {{ selectedMembre.lastName }}</p>
+        <p><strong>Anniversaire :</strong> {{ selectedMembre.birthday }}</p>
+        <p><strong>Service :</strong> {{ selectedMembre.service }}</p>
+        <p><strong>Requête :</strong> {{ selectedMembre.request }}</p>
+        <p><strong>Commentaire :</strong> {{ selectedMembre.comment }}</p>
+
+        <div class="mt-4 flex justify-end gap-2">
+          <button @click="closeModal" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Fermer</button>
+        </div>
       </div>
     </div>
   </div>
 </template>
-
