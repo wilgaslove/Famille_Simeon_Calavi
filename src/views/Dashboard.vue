@@ -75,6 +75,12 @@ const voirDetails = (membre) => {
   showModal.value = true;
 };
 
+// restricion par rôle
+defineProps({
+  userRole: String,
+  currentUser: Object
+});
+
 // Charger rôle utilisateur connecté
 onMounted(() => {
   onAuthStateChanged(auth, async (user) => {
@@ -91,6 +97,19 @@ onMounted(() => {
 </script>
 
 <template>
+
+    <div class="p-6">
+    <h2 class="text-2xl font-bold">Dashboard</h2>
+    <p class="mb-4">Votre rôle : <strong>{{ userRole }}</strong></p>
+
+    <div v-if="userRole === 'Admin' || userRole === 'SuperAdmin'">
+      ✅ Vous pouvez gérer les membres (CRUD)
+    </div>
+
+    <div v-else>
+      ⛔ Vous n'avez pas accès à cette section
+    </div>
+  </div>
   <div class="p-6">
     <h1 class="text-2xl font-bold">Dashboard</h1>
     <p class="mb-4">Connecté avec rôle : <strong>{{ userRole }}</strong></p>
