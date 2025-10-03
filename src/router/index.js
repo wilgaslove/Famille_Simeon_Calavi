@@ -4,7 +4,7 @@ import { auth, db } from "../firebase";
 import { getIdTokenResult } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
-import Login from "../views/Login.vue";
+import Login from "../components/Login.vue";
 import Dashboard from "../views/Dashboard.vue";
 
 const routes = [

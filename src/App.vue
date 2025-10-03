@@ -8,6 +8,7 @@ const userRole = ref(null);
 const currentUser = ref(null);
 
 onMounted(() => {
+   console.log("✅ Firebase connecté :", auth, db);
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser.value = user;
@@ -27,6 +28,10 @@ onMounted(() => {
 </script>
 
 <template>
+
+     <h1 class="text-center mt-10 text-2xl font-bold">Test Firebase 🚀</h1>
+
+
   <div>
     <!-- Header simple -->
     <header class="bg-gray-800 text-white p-4">
