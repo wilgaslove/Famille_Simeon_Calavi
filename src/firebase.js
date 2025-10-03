@@ -6,14 +6,13 @@ import { getFunctions } from "firebase/functions";
 import  { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: "TA_CLE_API",
-  authDomain: "TON_PROJET.firebaseapp.com",
-  projectId: "TON_PROJET",
-  storageBucket: "TON_PROJET.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef"
+  apiKey: "AIzaSyD0ubmpA7J5RA_BG0krb0dez57RUUajKCc",
+  authDomain: "famille-simeon-calavi.firebaseapp.com",
+  projectId: "famille-simeon-calavi",
+  storageBucket: "famille-simeon-calavi.firebasestorage.app",
+  messagingSenderId: "910547713559",
+  appId: "1:910547713559:web:b6b712159fafcbb43aa652"
 };
-
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
