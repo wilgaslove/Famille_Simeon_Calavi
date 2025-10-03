@@ -1,14 +1,28 @@
 <script setup>
 import { ref, onMounted } from "vue"
-import { db } from "../firebase"
-import {
-  collection,
-  addDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  doc
-} from "firebase/firestore"
+import { db, auth } from "../firebase"
+import { onAuthStateChanged, signOut } from "firebase/auth"
+import { doc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc} from "firebase/firestore"
+
+  // gestion de role
+const userRole = ref(null)
+const accessDenied = ref(false)
+// Vérifie le rôle de l’utilisateur connecté
+async function checkRole(user) {
+  const snap = await getDoc(doc(db, "users", user.uid))
+  if (snap.exists()) {
+    userRole.value = snap.data().role
+    if (userRole.value !== "Admin" && userRole.value !== "SuperAdmin") {
+      accessDenied.value = true
+      await signOut(auth) // déconnexion automatique si non autorisé
+    } else {
+      fetchMembres()
+    }
+  } else {
+    accessDenied.value = true
+    await signOut(auth)
+  }
+}
 
 // Références
 const membres = ref([])
@@ -65,8 +79,17 @@ function closeModal() {
   selectedMembre.value = null
 }
 
+
+
 onMounted(() => {
-  fetchMembres()
+  fetchMembres(),
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      checkRole(user)
+    } else {
+      accessDenied.value = true
+    }
+  })
 })
 </script>
 
