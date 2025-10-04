@@ -113,7 +113,7 @@ onMounted(() => {
       ✅ Vous pouvez gérer les membres (CRUD)
     </div>
     <div v-else-if="userRole">
-      ⛔ Vous n'avez pas accès à cette section
+      ⛔ Vous n'avez pas accès à cette section 😎
     </div>
 
     <!-- Formulaire ajout membre -->
