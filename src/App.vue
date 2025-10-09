@@ -28,19 +28,7 @@ onMounted(() => {
 </script>
 
 <template>
-
-     <h1 class="text-center mt-10 text-2xl font-bold">Test Firebase 🚀</h1>
-
-
-  <div>
-    <!-- Header simple -->
-    <header class="bg-gray-800 text-white p-4">
-      <h1 class="text-xl font-bold">Gestion du Groupe</h1>
-      <p v-if="currentUser">Connecté en tant que : {{ currentUser.email }} ({{ userRole }})</p>
-      <p v-else>Non connecté</p>
-    </header>
-
-    <!-- Les routes reçoivent le rôle -->
-    <router-view :userRole="userRole" :currentUser="currentUser" />
+  <div id="app" class="min-h-screen bg-gray-100">
+    <router-view :userRole="userRole" />
   </div>
 </template>

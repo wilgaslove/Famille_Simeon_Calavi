@@ -25,6 +25,8 @@ const nouveauMembre = ref({
   commentaire: "",
 });
 const userRole = ref(null);
+const userNom = ref(null);
+const userPrenom = ref(null);
 const selectedMembre = ref(null);
 const showModal = ref(false);
 
@@ -170,7 +172,7 @@ onMounted(() => {
           class="flex fixed top-0 left-0 w-full bg-white p-4 shadow-2xl xl:mx-[15%] xl:w-[70%]"
         >
           <h1 class="text-xl font-bold lg:px-2 lg:bg-gray-200">
-           Welcome {{ userRole }}
+          {{ userRole }} {{ userNom }} {{ userPrenom }}
           </h1>
           <div class="ml-auto shadow-2xl">
            
