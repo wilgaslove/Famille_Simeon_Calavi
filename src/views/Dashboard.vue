@@ -8,6 +8,7 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  getDoc
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -86,20 +87,24 @@ const voirDetails = (membre) => {
 // Vérification de l'utilisateur connecté
 onMounted(() => {
   onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      // Récupérer le document correspondant dans "users"
-      const usersSnap = await getDocs(collection(db, "users"));
-      const userDoc = usersSnap.docs.find((doc) => doc.data().uid === user.uid);
-      if (userDoc) {
-        userRole.value = userDoc.data().role; // ⚠️ ici .data() avant .role
-        console.log("Rôle détecté :", userRole.value);
-      } else {
-        userRole.value = "Utilisateur";
-      }
-      chargerMembres();
+  if (user) {
+  try {
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      userRole.value = userDocSnap.data().role;
+      console.log("Rôle détecté :", userRole.value);
     } else {
-      console.warn("Aucun utilisateur connecté");
+      userRole.value = "Utilisateur";
     }
+    await chargerMembres();
+  } catch (err) {
+    console.error("Erreur lors du chargement des données :", err);
+  }
+} else {
+  console.warn("Aucun utilisateur connecté");
+}
+
   });
 });
 </script>
