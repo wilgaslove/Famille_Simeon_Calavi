@@ -166,6 +166,17 @@ onMounted(() => {
       ⏳ Chargement des permissions...
     </div> -->
 
+      <div
+          class="flex fixed top-0 left-0 w-full bg-white p-4 shadow-2xl xl:mx-[15%] xl:w-[70%]"
+        >
+          <h1 class="text-xl font-bold lg:px-2 lg:bg-gray-200">
+           Welcome {{ userRole }}
+          </h1>
+          <div class="ml-auto shadow-2xl">
+           
+          </div>
+        </div>
+
     <div v-if="membres.length" class="mt-4">
       <h3 class="font-semibold mb-2">📋 Liste des membres</h3>
       <ul>
