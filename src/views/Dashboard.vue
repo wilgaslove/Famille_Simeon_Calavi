@@ -145,15 +145,15 @@ onMounted(() => {
 
 <template>
   <div class="p-6">
-    <h2 class="text-2xl font-bold mb-4">Dashboard</h2>
+    <!-- <h2 class="text-2xl font-bold mb-4">Dashboard</h2> -->
 
-    <p class="mb-4">
+    <!-- <p class="mb-4">
       Votre rôle :
       <strong>{{ userRole || "Chargement..." }}</strong>
-    </p>
+    </p> -->
 
     <!-- Message selon le rôle -->
-    <div v-if="userRole === 'SuperAdmin'">
+    <!-- <div v-if="userRole === 'SuperAdmin'">
       👑 <strong>SuperAdmin :</strong> Vous pouvez tout gérer (ajouter, modifier, supprimer).
     </div>
     <div v-else-if="userRole === 'Admin'">
@@ -164,26 +164,8 @@ onMounted(() => {
     </div>
     <div v-else>
       ⏳ Chargement des permissions...
-    </div>
+    </div> -->
 
-    <!-- Formulaire ajout membre -->
-    <div
-      v-if="userRole === 'Admin' || userRole === 'SuperAdmin'"
-      class="mt-6 mb-6 border p-4 rounded shadow bg-gray-50"
-    >
-      <h3 class="font-semibold mb-2">➕ Ajouter un membre</h3>
-      <input v-model="nouveauMembre.nom" placeholder="Nom" class="border p-2 m-1 rounded w-full" />
-      <input v-model="nouveauMembre.prenom" placeholder="Prénom" class="border p-2 m-1 rounded w-full" />
-      <input type="date" v-model="nouveauMembre.dateAnniversaire" class="border p-2 m-1 rounded w-full" />
-      <input v-model="nouveauMembre.pole" placeholder="Pôle" class="border p-2 m-1 rounded w-full" />
-      <input v-model="nouveauMembre.requete" placeholder="Requête" class="border p-2 m-1 rounded w-full" />
-      <textarea v-model="nouveauMembre.commentaire" placeholder="Commentaire" class="border p-2 m-1 rounded w-full"></textarea>
-      <button @click="ajouterMembre" class="bg-blue-600 text-white px-4 py-2 mt-2 rounded hover:bg-blue-700">
-        Ajouter
-      </button>
-    </div>
-
-    <!-- Liste des membres -->
     <div v-if="membres.length" class="mt-4">
       <h3 class="font-semibold mb-2">📋 Liste des membres</h3>
       <ul>
@@ -213,6 +195,26 @@ onMounted(() => {
     </div>
     <p v-else class="text-gray-500 mt-4">Aucun membre enregistré.</p>
 
+
+    <!-- Formulaire ajout membre -->
+    <div
+      v-if="userRole === 'Admin' || userRole === 'SuperAdmin'"
+      class="mt-6 mb-6 border p-4 rounded shadow bg-gray-50"
+    >
+      <h3 class="font-semibold mb-2">➕ Ajouter un membre</h3>
+      <input v-model="nouveauMembre.nom" placeholder="Nom" class="border p-2 m-1 rounded w-full" />
+      <input v-model="nouveauMembre.prenom" placeholder="Prénom" class="border p-2 m-1 rounded w-full" />
+      <input type="date" v-model="nouveauMembre.dateAnniversaire" class="border p-2 m-1 rounded w-full" />
+      <input v-model="nouveauMembre.pole" placeholder="Pôle" class="border p-2 m-1 rounded w-full" />
+      <input v-model="nouveauMembre.requete" placeholder="Requête" class="border p-2 m-1 rounded w-full" />
+      <textarea v-model="nouveauMembre.commentaire" placeholder="Commentaire" class="border p-2 m-1 rounded w-full"></textarea>
+      <button @click="ajouterMembre" class="bg-blue-600 text-white px-4 py-2 mt-2 rounded hover:bg-blue-700">
+        Ajouter
+      </button>
+    </div>
+
+    <!-- Liste des membres -->
+    
     <!-- Modal détails membre -->
     <div
       v-if="showModal"
