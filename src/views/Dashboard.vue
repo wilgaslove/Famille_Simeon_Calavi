@@ -1,118 +1,110 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { db, auth } from "../firebase";
-import {
-  collection,
-  getDocs,
-  getDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+import { ref, onMounted } from 'vue'
+import { db, auth } from '../firebase'
+import { collection, getDocs, getDoc, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
+import { onAuthStateChanged } from 'firebase/auth'
 
 // ===============================
 // 🔹 Variables réactives
 // ===============================
-const membres = ref([]);
+const membres = ref([])
 const nouveauMembre = ref({
-  nom: "",
-  prenom: "",
-  dateAnniversaire: "",
-  pole: "",
-  requete: "",
-  commentaire: "",
-});
-const userRole = ref(null);
-const userNom = ref(null);
-const userPrenom = ref(null);
-const selectedMembre = ref(null);
-const showModal = ref(false);
+  nom: '',
+  prenom: '',
+  dateAnniversaire: '',
+  pole: '',
+  requete: '',
+  commentaire: '',
+})
+const userRole = ref(null)
+const userNom = ref(null)
+const userPrenom = ref(null)
+const selectedMembre = ref(null)
+const showModal = ref(false)
 
 // Référence de la collection Firestore
-const membresCollection = collection(db, "membres");
+const membresCollection = collection(db, 'membres')
 
 // ===============================
 // 🔹 Charger les membres
 // ===============================
 const chargerMembres = async () => {
   try {
-    const snapshot = await getDocs(membresCollection);
+    const snapshot = await getDocs(membresCollection)
     membres.value = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    }));
+    }))
   } catch (error) {
-    console.error("Erreur lors du chargement des membres :", error);
+    console.error('Erreur lors du chargement des membres :', error)
   }
-};
+}
 
 // ===============================
 // 🔹 Ajouter un membre
 // ===============================
 const ajouterMembre = async () => {
-  if (userRole.value === "Admin" || userRole.value === "SuperAdmin") {
+  if (userRole.value === 'Admin' || userRole.value === 'SuperAdmin') {
     try {
-      await addDoc(membresCollection, nouveauMembre.value);
+      await addDoc(membresCollection, nouveauMembre.value)
       nouveauMembre.value = {
-        nom: "",
-        prenom: "",
-        dateAnniversaire: "",
-        pole: "",
-        requete: "",
-        commentaire: "",
-      };
-      await chargerMembres();
+        nom: '',
+        prenom: '',
+        dateAnniversaire: '',
+        pole: '',
+        requete: '',
+        commentaire: '',
+      }
+      await chargerMembres()
     } catch (error) {
-      console.error("Erreur lors de l'ajout :", error);
+      console.error("Erreur lors de l'ajout :", error)
     }
   } else {
-    alert("⛔ Accès refusé !");
+    alert('⛔ Accès refusé !')
   }
-};
+}
 
 // ===============================
 // 🔹 Supprimer un membre
 // ===============================
 const supprimerMembre = async (id) => {
-  if (userRole.value === "SuperAdmin") {
+  if (userRole.value === 'SuperAdmin') {
     try {
-      await deleteDoc(doc(db, "membres", id));
-      await chargerMembres();
+      await deleteDoc(doc(db, 'membres', id))
+      await chargerMembres()
     } catch (error) {
-      console.error("Erreur lors de la suppression :", error);
+      console.error('Erreur lors de la suppression :', error)
     }
   } else {
-    alert("⛔ Seul le SuperAdmin peut supprimer !");
+    alert('⛔ Seul le SuperAdmin peut supprimer !')
   }
-};
+}
 
 // ===============================
 // 🔹 Modifier un membre
 // ===============================
 const modifierMembre = async () => {
-  if (userRole.value === "Admin" || userRole.value === "SuperAdmin") {
+  if (userRole.value === 'Admin' || userRole.value === 'SuperAdmin') {
     try {
-      const docRef = doc(db, "membres", selectedMembre.value.id);
-      await updateDoc(docRef, { ...selectedMembre.value });
-      showModal.value = false;
-      await chargerMembres();
+      const docRef = doc(db, 'membres', selectedMembre.value.id)
+      await updateDoc(docRef, { ...selectedMembre.value })
+      showModal.value = false
+      await chargerMembres()
     } catch (error) {
-      console.error("Erreur lors de la modification :", error);
+      console.error('Erreur lors de la modification :', error)
     }
   } else {
-    alert("⛔ Accès refusé !");
+    alert('⛔ Accès refusé !')
   }
-};
+}
 
 // ===============================
 // 🔹 Voir les détails (modal)
 // ===============================
 const voirDetails = (membre) => {
-  selectedMembre.value = { ...membre };
-  showModal.value = true;
-};
+  selectedMembre.value = { ...membre }
+  showModal.value = true
+}
 
 // ===============================
 // 🔹 Vérification du rôle utilisateur
@@ -122,27 +114,27 @@ onMounted(() => {
     if (user) {
       try {
         // Lecture directe du document utilisateur
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
+        const userDocRef = doc(db, 'users', user.uid)
+        const userDocSnap = await getDoc(userDocRef)
 
         if (userDocSnap.exists()) {
-          userRole.value = userDocSnap.data().role;
-          console.log("✅ Rôle détecté :", userRole.value);
+          userRole.value = userDocSnap.data().role
+          console.log('✅ Rôle détecté :', userRole.value)
         } else {
-          userRole.value = "Utilisateur";
-          console.warn("Aucun rôle trouvé pour cet utilisateur.");
+          userRole.value = 'Utilisateur'
+          console.warn('Aucun rôle trouvé pour cet utilisateur.')
         }
 
-        await chargerMembres();
+        await chargerMembres()
       } catch (err) {
-        console.error("Erreur lors du chargement du rôle :", err);
+        console.error('Erreur lors du chargement du rôle :', err)
       }
     } else {
-      console.warn("Aucun utilisateur connecté");
-      userRole.value = null;
+      console.warn('Aucun utilisateur connecté')
+      userRole.value = null
     }
-  });
-});
+  })
+})
 </script>
 
 <template>
@@ -168,16 +160,12 @@ onMounted(() => {
       ⏳ Chargement des permissions...
     </div> -->
 
-      <div
-          class="flex fixed top-0 left-0 w-full bg-white p-4 shadow-2xl xl:mx-[15%] xl:w-[70%]"
-        >
-          <h1 class="text-xl font-bold lg:px-2 lg:bg-gray-200">
-          {{ userRole }} {{ userNom }} {{ userPrenom }}
-          </h1>
-          <div class="ml-auto shadow-2xl">
-           
-          </div>
-        </div>
+    <div class="flex fixed top-0 left-0 w-full bg-white p-4 shadow-2xl xl:mx-[15%] xl:w-[70%]">
+      <h1 class="text-xl font-bold lg:px-2 lg:bg-gray-200">
+        {{ userRole }} {{ userNom }} {{ userPrenom }}
+      </h1>
+      <div class="ml-auto shadow-2xl"></div>
+    </div>
 
     <div v-if="membres.length" class="mt-4">
       <h3 class="font-semibold mb-2">📋 Liste des membres</h3>
@@ -208,7 +196,6 @@ onMounted(() => {
     </div>
     <p v-else class="text-gray-500 mt-4">Aucun membre enregistré.</p>
 
-
     <!-- Formulaire ajout membre -->
     <div
       v-if="userRole === 'Admin' || userRole === 'SuperAdmin'"
@@ -216,18 +203,41 @@ onMounted(() => {
     >
       <h3 class="font-semibold mb-2">➕ Ajouter un membre</h3>
       <input v-model="nouveauMembre.nom" placeholder="Nom" class="border p-2 m-1 rounded w-full" />
-      <input v-model="nouveauMembre.prenom" placeholder="Prénom" class="border p-2 m-1 rounded w-full" />
-      <input type="date" v-model="nouveauMembre.dateAnniversaire" class="border p-2 m-1 rounded w-full" />
-      <input v-model="nouveauMembre.pole" placeholder="Pôle" class="border p-2 m-1 rounded w-full" />
-      <input v-model="nouveauMembre.requete" placeholder="Requête" class="border p-2 m-1 rounded w-full" />
-      <textarea v-model="nouveauMembre.commentaire" placeholder="Commentaire" class="border p-2 m-1 rounded w-full"></textarea>
-      <button @click="ajouterMembre" class="bg-blue-600 text-white px-4 py-2 mt-2 rounded hover:bg-blue-700">
+      <input
+        v-model="nouveauMembre.prenom"
+        placeholder="Prénom"
+        class="border p-2 m-1 rounded w-full"
+      />
+      <input
+        type="date"
+        v-model="nouveauMembre.dateAnniversaire"
+        class="border p-2 m-1 rounded w-full"
+      />
+      <input
+        v-model="nouveauMembre.pole"
+        placeholder="Pôle"
+        class="border p-2 m-1 rounded w-full"
+      />
+      <input
+        v-model="nouveauMembre.requete"
+        placeholder="Requête"
+        class="border p-2 m-1 rounded w-full"
+      />
+      <textarea
+        v-model="nouveauMembre.commentaire"
+        placeholder="Commentaire"
+        class="border p-2 m-1 rounded w-full"
+      ></textarea>
+      <button
+        @click="ajouterMembre"
+        class="bg-blue-600 text-white px-4 py-2 mt-2 rounded hover:bg-blue-700"
+      >
         Ajouter
       </button>
     </div>
 
     <!-- Liste des membres -->
-    
+
     <!-- Modal détails membre -->
     <div
       v-if="showModal"
@@ -238,10 +248,20 @@ onMounted(() => {
 
         <input v-model="selectedMembre.nom" class="border p-2 w-full mb-2 rounded" />
         <input v-model="selectedMembre.prenom" class="border p-2 w-full mb-2 rounded" />
-        <input type="date" v-model="selectedMembre.dateAnniversaire" class="border p-2 w-full mb-2 rounded" />
+        <input
+          type="date"
+          v-model="selectedMembre.dateAnniversaire"
+          class="border p-2 w-full mb-2 rounded"
+        />
         <input v-model="selectedMembre.pole" class="border p-2 w-full mb-2 rounded" />
-        <textarea v-model="selectedMembre.requete" class="border p-2 w-full mb-2 rounded"></textarea>
-        <textarea v-model="selectedMembre.commentaire" class="border p-2 w-full mb-2 rounded"></textarea>
+        <textarea
+          v-model="selectedMembre.requete"
+          class="border p-2 w-full mb-2 rounded"
+        ></textarea>
+        <textarea
+          v-model="selectedMembre.commentaire"
+          class="border p-2 w-full mb-2 rounded"
+        ></textarea>
 
         <div class="flex justify-end gap-2 mt-4">
           <button
