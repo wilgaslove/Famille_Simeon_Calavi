@@ -168,15 +168,18 @@ onMounted(() => {
     </div>
 
     <div v-if="membres.length" class="mt-4">
-      <h3 class="font-semibold mb-2">📋 Liste des membres</h3>
+      <!-- <h3 class="font-semibold mb-2"> Liste des membres</h3> -->
+      <div class="text-center my-2">
+        <strong class="text-lg mb-2"> 📋 Liste des membres</strong>
+      </div>
       <ul>
         <li
           v-for="m in membres"
           :key="m.id"
-          class="border p-3 flex justify-between items-center mb-2 rounded bg-white shadow-sm"
+          class="flex justify-between items-center border p-2 rounded bg-white shadow"
         >
           <span>{{ m.nom }} {{ m.prenom }}</span>
-          <div class="flex gap-2">
+          <div class="flex gap-3 text-xl">
             <button
               @click="voirDetails(m)"
               class="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700"
