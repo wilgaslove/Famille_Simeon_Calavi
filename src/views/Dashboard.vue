@@ -106,6 +106,8 @@ const voirDetails = (membre) => {
   showModal.value = true
 }
 
+
+
 // ===============================
 // 🔹 Vérification du rôle utilisateur
 // ===============================
@@ -135,30 +137,12 @@ onMounted(() => {
     }
   })
 })
+
 </script>
 
 <template>
   <div class="p-6">
-    <!-- <h2 class="text-2xl font-bold mb-4">Dashboard</h2> -->
-
-    <!-- <p class="mb-4">
-      Votre rôle :
-      <strong>{{ userRole || "Chargement..." }}</strong>
-    </p> -->
-
-    <!-- Message selon le rôle -->
-    <!-- <div v-if="userRole === 'SuperAdmin'">
-      👑 <strong>SuperAdmin :</strong> Vous pouvez tout gérer (ajouter, modifier, supprimer).
-    </div>
-    <div v-else-if="userRole === 'Admin'">
-      🧑‍💼 <strong>Admin :</strong> Vous pouvez ajouter et modifier les membres.
-    </div>
-    <div v-else-if="userRole === 'Utilisateur'">
-      👤 <strong>Utilisateur :</strong> Lecture seule.
-    </div>
-    <div v-else>
-      ⏳ Chargement des permissions...
-    </div> -->
+  
 
     <div class="flex fixed top-0 left-0 w-full bg-white p-4 shadow-2xl xl:mx-[15%] xl:w-[70%]">
       <h1 class="text-xl font-bold lg:px-2 lg:bg-gray-200">
