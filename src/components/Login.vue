@@ -1,28 +1,29 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-    <h1 class="text-3xl font-bold mb-6">Connexion</h1>
-    <div class="bg-white p-8 rounded shadow-md w-80">
+  <div class="">
+    <!-- <h1 class="text-3xl font-bold mb-6">Connexion</h1> -->
+    <div class="flex flex-col gap-4">
       <input
         v-model="email"
         type="email"
         placeholder="Email"
-        class="border rounded w-full px-3 py-2 mb-3"
+        class=""
       />
       <input
         v-model="password"
         type="password"
         placeholder="Mot de passe"
-        class="border rounded w-full px-3 py-2 mb-3"
+        class=""
       />
       <button
         @click="login"
-        class="bg-blue-600 text-white rounded w-full py-2 hover:bg-blue-700"
+        class=""
       >
         Connexion
       </button>
-      <p v-if="errorMessage" class="text-red-500 mt-2 text-sm">{{ errorMessage }}</p>
+      <p v-if="errorMessage" class="">{{ errorMessage }}</p>
     </div>
   </div>
+  <button @click="deconnect">Déconnexion</button>
 </template>
 
 <script setup>
@@ -74,5 +75,12 @@ const login = async () => {
     console.error("❌ Erreur :", error);
     errorMessage.value = "Identifiants invalides ou problème de connexion.";
   }
+};
+
+const deconnect = () => {
+  auth.signOut().then(() => {
+    localStorage.removeItem("userRole");
+    router.push("/login");
+  });
 };
 </script>
