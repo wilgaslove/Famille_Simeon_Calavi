@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { db, auth } from '../firebase'
 import { collection, getDocs, getDoc, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
+import { useRoute } from 'vue-router'
 
 // ===============================
 // 🔹 Variables réactives
@@ -111,22 +112,22 @@ const voirDetails = (membre) => {
 // ===============================
 // 🔹 Déconnexion
 // ===============================
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 
-const deconnect = async () => {
-  try {
-    await signOut(auth)
-    userRole.value = null
-    userNom.value = null
-    userPrenom.value = null
-    membres.value = []
+// const deconnect = async () => {
+//   try {
+//     await signOut(auth)
+//     userRole.value = null
+//     userNom.value = null
+//     userPrenom.value = null
+//     membres.value = []
 
-    // Redirection vers la page de connexion
-    router.push('/')
-  } catch (error) {
-    console.error('Erreur lors de la déconnexion :', error)
-  }
-}
+//     // Redirection vers la page de connexion
+//     router.push('/')
+//   } catch (error) {
+//     console.error('Erreur lors de la déconnexion :', error)
+//   }
+// }
 
 // ===============================
 // 🔹 Vérification du rôle utilisateur
@@ -246,12 +247,12 @@ onMounted(() => {
           >
             Modifier
           </button>
-          <button
+          <!-- <button
             @click="showModal = false"
             class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
           >
             Fermer
-          </button>
+          </button> -->
         </div>
       </div>
     </div>
