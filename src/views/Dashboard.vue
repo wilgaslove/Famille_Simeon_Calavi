@@ -112,23 +112,7 @@ const voirDetails = (membre) => {
 // ===============================
 // 🔹 Déconnexion
 // ===============================
-// import { useRouter } from 'vue-router'
-
-// const deconnect = async () => {
-//   try {
-//     await signOut(auth)
-//     userRole.value = null
-//     userNom.value = null
-//     userPrenom.value = null
-//     membres.value = []
-
-//     // Redirection vers la page de connexion
-//     router.push('/')
-//   } catch (error) {
-//     console.error('Erreur lors de la déconnexion :', error)
-//   }
-// }
-
+ 
 // ===============================
 // 🔹 Vérification du rôle utilisateur
 // ===============================
@@ -258,22 +242,21 @@ onMounted(() => {
     </div>
 
     <!-- ✅ Bouton de déconnexion -->
-    <button
+    <!-- <button
       @click="deconnect"
       class="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-700 transition"
     >
       Déconnexion
-    </button>
+    </button> -->
   </div>
 </template>
 
 <style scoped>
-.fade-enter-active,
+/* .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s;
 }
 .fade-enter-from,
 .fade-leave-to {
-  opacity: 0;
-}
+} */
 </style>
