@@ -10,19 +10,19 @@
           v-model="email"
           type="email"
           placeholder="Adresse e-mail"
-          
+          class="w-full px-4 py-2 bg-blue-50 border border-blue-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-700"
         />
 
         <input
           v-model="password"
           type="password"
           placeholder="Mot de passe"
-          
+          class="w-full px-4 py-2 bg-blue-50 border border-blue-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-700"
         />
 
         <button
           @click="login"
-          
+          class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md font-semibold transition duration-300"
         >
           Se connecter
         </button>
