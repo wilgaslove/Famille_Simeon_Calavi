@@ -28,7 +28,7 @@ const showAddForm = ref(false)
 const membresCollection = collection(db, 'membres')
 
 // ===============================
-// 🔹 Charger les membres
+//  Charger les membres
 // ===============================
 const chargerMembres = async () => {
   try {
@@ -43,7 +43,7 @@ const chargerMembres = async () => {
 }
 
 // ===============================
-// 🔹 Ajouter un membre
+//  Ajouter un membre
 // ===============================
 const ajouterMembre = async () => {
   if (userRole.value === 'Admin' || userRole.value === 'SuperAdmin') {
