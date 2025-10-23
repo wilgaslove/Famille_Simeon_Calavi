@@ -3,7 +3,6 @@ import { ref, onMounted } from 'vue'
 import { db, auth } from '../firebase'
 import { collection, getDocs, getDoc, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
-import { useRoute } from 'vue-router'
 
 // ===============================
 // 🔹 Variables réactives
